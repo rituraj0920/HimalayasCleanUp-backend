@@ -11,35 +11,38 @@ require('dotenv').config();
 //       region: '',
 //       motivation: ''
 
+async function registerVolunteer(req, res) {
+  try {
+    const { fullName, email, phone, region, motivation } = req.body;
 
-async function registerVolunteer(req, res){
-    const {fullName, email , phone,region,motivation}= req.body;
+    const isUserAlreadyExists = await volunteerModel.findOne({ email });
 
-    const isUserAlreadyExists = await volunteerModel.findOne({
-        email
-    })
-
-    if(isUserAlreadyExists){
-        return res.status(400).json({
-            message:"user already exists"
-        })
+    if (isUserAlreadyExists) {
+      return res.status(400).json({
+        message: "User already exists"
+      });
     }
-     const user =await volunteerModel.create({
-        fullName,
-        email,
-        phone,
-        region,
-        motivation
-    })
+
+    const user = await volunteerModel.create({
+      fullName,
+      email,
+      phone,
+      region,
+      motivation
+    });
+
     res.status(201).json({
-        message:"user registered successfully",
-        user:{
-            _id:user._id,
-            email:user.email,
-            fullName: user.fullName
-        }
-    })
-   
+      message: "User registered successfully",
+      user
+    });
+
+  } catch (error) {
+    console.error(error); // <-- Actual error terminal me print hoga
+
+    res.status(500).json({
+      message: error.message
+    });
+  }
 }
 
 module.exports={
